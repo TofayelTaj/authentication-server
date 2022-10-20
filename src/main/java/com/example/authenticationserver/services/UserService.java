@@ -5,7 +5,6 @@ import com.example.authenticationserver.enums.OAuthProvider;
 import com.example.authenticationserver.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.ModelAttribute;
 
 @Service
 public class UserService {
@@ -21,6 +20,10 @@ public class UserService {
         User user = new User();
         user.setProvider(provider);
         return userRepository.save(user);
+    }
+
+    public User findUserByEmail(String email){
+       return userRepository.findByEmail(email);
     }
 
 }

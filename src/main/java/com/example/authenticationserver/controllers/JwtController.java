@@ -4,15 +4,18 @@ import com.example.authenticationserver.entites.JwtRequest;
 import com.example.authenticationserver.entites.JwtResponse;
 import com.example.authenticationserver.utility.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 public class JwtController {
 
@@ -42,5 +45,6 @@ public class JwtController {
 
         return new JwtResponse(token, "success");
     }
+
 
 }

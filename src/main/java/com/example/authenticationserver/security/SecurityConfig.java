@@ -13,8 +13,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -38,7 +36,7 @@ public class SecurityConfig {
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/user", "/authenticate")
+                .antMatchers("/user", "/authenticate", "/auth", "/logouturl", "/oauth2/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
@@ -46,9 +44,9 @@ public class SecurityConfig {
                 .httpBasic()
                 .and()
                 .oauth2Login()
-                    .loginPage("/")
-                    .userInfoEndpoint().userService(customOAuth2UserService)
-                    .and()
+                .loginPage("/login")
+                .userInfoEndpoint().userService(customOAuth2UserService)
+                .and()
                 .and()
                 .rememberMe()
                 .and()
