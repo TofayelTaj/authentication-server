@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.bind.annotation.*;
@@ -31,12 +33,14 @@ public class JwtController {
     public JwtResponse authenticate(@RequestBody JwtRequest jwtRequest) throws Exception {
 
         try {
-            authenticationManager.authenticate(
+            Authentication authenticate = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             jwtRequest.getEmail(),
                             jwtRequest.getPassword()
                     )
             );
+            SecurityContextHolder.getContext().setAuthentication(authenticate);
+
         }catch (BadCredentialsException e){
             return new JwtResponse("", "Invalid User Name or Password !");
         }

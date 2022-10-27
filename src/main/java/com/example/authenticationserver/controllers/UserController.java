@@ -2,13 +2,11 @@ package com.example.authenticationserver.controllers;
 
 import com.example.authenticationserver.entites.User;
 import com.example.authenticationserver.enums.OAuthProvider;
-import com.example.authenticationserver.security.CustomUserDetails;
 import com.example.authenticationserver.services.UserService;
 import com.example.authenticationserver.utility.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,21 +38,9 @@ public class UserController {
         }
     }
 
-    @GetMapping("/auth")
-    public ResponseEntity<String> doAuthenticateToken(HttpServletRequest request){
-       String token = request.getHeader("authorization");
-        if(token != null ){
-            String name = jwtUtil.getUsernameFromToken(token.substring(7));
-            User user = userService.findUserByEmail(name);
-            UserDetails userDetails = new CustomUserDetails(user);
-            boolean isTokenValid = jwtUtil.validateToken(token.substring(7), userDetails);
-            if(!isTokenValid){
-                return new ResponseEntity<>("invalid user", HttpStatus.FORBIDDEN);
-            }
-        }else {
-            return new ResponseEntity<>("invalid user", HttpStatus.FORBIDDEN);
-        }
-        return new ResponseEntity<>("success", HttpStatus.OK);
+    @GetMapping("/logout")
+    public ResponseEntity<String> logout(HttpServletRequest request){
+        request.getSession().removeAttribute("userName");
+        return ResponseEntity.ok("logout success");
     }
-
 }

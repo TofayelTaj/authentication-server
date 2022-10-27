@@ -1,7 +1,8 @@
-package com.example.authenticationserver.security;
+package com.example.authenticationserver.configurations;
 
 import com.example.authenticationserver.filters.JwtFilter;
 import com.example.authenticationserver.oAuth.CustomOAuth2UserService;
+import com.example.authenticationserver.oAuth.OAuth2LoginSuccessHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -29,6 +30,8 @@ public class SecurityConfig {
     private JwtFilter jwtFilter;
     @Autowired
     private CustomOAuth2UserService customOAuth2UserService;
+    @Autowired
+    private OAuth2LoginSuccessHandler successHandler;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -36,15 +39,18 @@ public class SecurityConfig {
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/user", "/authenticate", "/auth", "/logouturl", "/oauth2/**")
+                .antMatchers("/user", "/authenticate", "/auth", "/logouturl", "/oauth2/**", "/login")
                 .permitAll()
+                .antMatchers("/admin/**")
+                .hasRole("ADMIN")
+                .antMatchers("/app-user")
+                .hasRole("USER")
                 .anyRequest()
                 .authenticated()
                 .and()
-                .httpBasic()
-                .and()
                 .oauth2Login()
-                .loginPage("/login")
+                .successHandler(successHandler)
+                .defaultSuccessUrl("/oauthSuccessLogin")
                 .userInfoEndpoint().userService(customOAuth2UserService)
                 .and()
                 .and()

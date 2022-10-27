@@ -1,4 +1,4 @@
-package com.example.authenticationserver.security;
+package com.example.authenticationserver.configurations;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
