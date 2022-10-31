@@ -39,18 +39,13 @@ public class SecurityConfig {
                 .csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/user", "/authenticate", "/auth", "/logouturl", "/oauth2/**", "/login")
+                .antMatchers("/user", "/authenticate", "/auth", "/oauth2/**", "/login")
                 .permitAll()
-                .antMatchers("/admin/**")
-                .hasRole("ADMIN")
-                .antMatchers("/app-user")
-                .hasRole("USER")
                 .anyRequest()
                 .authenticated()
                 .and()
                 .oauth2Login()
                 .successHandler(successHandler)
-                .defaultSuccessUrl("/oauthSuccessLogin")
                 .userInfoEndpoint().userService(customOAuth2UserService)
                 .and()
                 .and()
@@ -70,7 +65,6 @@ public class SecurityConfig {
         daoAuthenticationProvider.setUserDetailsService(userDetailsService);
         return daoAuthenticationProvider;
     }
-
 
     @Bean
     protected AuthenticationManager authenticationManagerBean(AuthenticationConfiguration authenticationConfiguration) throws Exception {

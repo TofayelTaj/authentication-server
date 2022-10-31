@@ -2,11 +2,13 @@ package com.example.authenticationserver.controllers;
 
 import com.example.authenticationserver.entites.User;
 import com.example.authenticationserver.enums.OAuthProvider;
+import com.example.authenticationserver.security.CustomUserDetails;
 import com.example.authenticationserver.services.UserService;
-import com.example.authenticationserver.utility.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,8 +25,6 @@ public class UserController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private JwtUtil jwtUtil;
 
     @PostMapping("/user")
     public ResponseEntity<String> saveNewUser(@RequestBody  User user){
@@ -37,7 +37,13 @@ public class UserController {
             return new ResponseEntity("Duplicate", HttpStatus.BAD_REQUEST);
         }
     }
-
+    @GetMapping("/user")
+    public ResponseEntity<User> getAuthenticatedUser(HttpServletRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        CustomUserDetails authenticatedUser =(CustomUserDetails) authentication.getPrincipal();
+        User user = authenticatedUser.getUser();
+        return new ResponseEntity<>(user, HttpStatus.OK);
+    }
     @GetMapping("/logout")
     public ResponseEntity<String> logout(HttpServletRequest request){
         request.getSession().removeAttribute("userName");

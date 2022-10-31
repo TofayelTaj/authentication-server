@@ -21,13 +21,11 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
     private UserRepository userRepository;
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        super.onAuthenticationSuccess(request, response, authentication);
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
         String email = oAuth2User.getEmail();
         String name = oAuth2User.getName();
         User user = userRepository.findByEmail(email);
         if(user == null){
-//            new user
             User newUser = new User();
             newUser.setName(name);
             newUser.setEmail(email);
@@ -35,10 +33,10 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             newUser.setProvider(OAuthProvider.GOOGLE);
             userRepository.save(newUser);
         }else{
-//            existing user
             user.setName(name);
-
             user.setProvider(OAuthProvider.GOOGLE);
         }
+        response.sendRedirect("http://localhost:8080/home");
+        super.onAuthenticationSuccess(request,response, authentication);
     }
 }
