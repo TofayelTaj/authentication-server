@@ -1,18 +1,16 @@
 package com.example.authenticationserver.oAuth;
 
-import com.example.authenticationserver.entites.JwtResponse;
 import com.example.authenticationserver.entites.User;
 import com.example.authenticationserver.enums.OAuthProvider;
 import com.example.authenticationserver.enums.Role;
 import com.example.authenticationserver.repositories.UserRepository;
+import com.example.authenticationserver.utility.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -23,7 +21,11 @@ import java.io.IOException;
 public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     @Autowired
+    private JwtUtil jwtUtil;
+    @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private UserDetailsService customUserDetails;
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
@@ -41,15 +43,11 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
             user.setName(name);
             user.setProvider(OAuthProvider.GOOGLE);
         }
-//        response.addHeader("email", user.getEmail());
-//        response.sendRedirect("http://localhost:8081/login");
 
-        RestTemplate restTemplate = new RestTemplate();
-        ResponseEntity<JwtResponse> responseEntity = restTemplate.exchange("http://localhost:8081/login", HttpMethod.POST, new HttpEntity<>(user), JwtResponse.class);
-
-        response.addHeader("authorization", responseEntity.getBody().getJwtToken());
-        response.sendRedirect("http://localhost:8081/dashboard");
-
+        final UserDetails userDetails = customUserDetails.loadUserByUsername(user.getEmail());
+        String token = jwtUtil.generateToken(userDetails);
+        response.setHeader("authorization", token);
+        response.sendRedirect("http://localhost:8081/oauthLogin/?token=" + token);
         super.onAuthenticationSuccess(request,response, authentication);
     }
 }
